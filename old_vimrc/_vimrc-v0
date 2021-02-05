@@ -1,0 +1,121 @@
+"settings
+set nocompatible
+set backspace=start,eol,indent
+filetype plugin indent on
+set ruler		" show the cursor position all the time
+set showcmd		" display incomplete commands
+set wildmenu		" display completion matches in a status line
+
+set langmenu=none
+syntax on
+filetype plugin on
+set noerrorbells
+set visualbell t_vb=
+if has("autocmd") && has("gui")
+    au GUIEnter * set t_vb=
+endif
+"copying into * register no matter what
+set clipboard=unnamed
+
+"auto brackets
+inoremap { {}<Left>
+inoremap {<CR> {<CR>}<Esc>O
+"??
+inoremap {{ { 
+inoremap {} {}
+inoremap ( ()<Left>
+inoremap () ()
+inoremap "" "
+inoremap " ""<Left>
+inoremap ' ''<Left>
+inoremap '' '
+set matchpairs+=<:>
+"let g:matchparen_timeout = 20
+"let g:matchparen_insert_timeout = 20
+
+"colorscheme and gui
+set background=dark
+let g:gruvbox_contrast_dark='hard'
+colorscheme gruvbox
+set guifont=DejaVu_Sans_Mono:h12:cANSI
+"set guifont=Lucida_Sans_Typewriter:h10:cANSI
+set nu
+augroup numbertoggle
+    autocmd!
+    autocmd BufEnter,FocusGained,InsertLeave * set rnu
+    autocmd BufLeave,FocusLost,InsertEnter * set nornu
+augroup END
+"set number "this sets line nums
+"set relativenumber "this sets relative line nums
+set cmdheight=2 
+"this avoids pressing enter twice by expanding the message length
+
+
+
+"tabs are set and expanded to 4 spaces 
+set tabstop=4 softtabstop=4 shiftwidth=4
+set expandtab
+set autoindent  smartindent
+
+"noo extra files
+set noswapfile
+set nobackup
+
+set incsearch
+set hlsearch
+
+" Delete trailing white space on save, useful for some filetypes
+fun! CleanExtraSpaces()
+    let save_cursor = getpos(".")
+    let old_query = getreg('/')
+    silent! %s/\s\+$//e
+    call setpos('.', save_cursor)
+    call setreg('/', old_query)
+endfun
+
+if has("autocmd")
+    autocmd BufWritePre *.txt,*.js,*.py :call CleanExtraSpaces()
+endif
+
+
+"enabled by the filetype plugin
+:autocmd BufNewFile *.html 0r $HOME/vim/skeleton.html
+:autocmd BufNewFile *.html :set encoding=utf-8
+:autocmd BufNewFile *.cpp 0r $HOME/vim/skeleton.cpp
+
+"cool experiment which sets the date on any html file
+autocmd BufWritePre,FileWritePre *.html   ks|call LastMod()|'s
+
+:fun LastMod()
+:  if line("$") > 20
+:    let l = 20
+:  else
+:    let l = line("$")
+:  endif
+:  execute "1," . l . ": g/Last modified: /s/Last modified: .*/Last modified: " . strftime("%Y %b %d")
+:endfun
+let mapleader = ','
+"emmet for html
+"let g:user_emmet_mode='a'
+let g:user_emmet_leader_key=','
+
+"filetree stuff
+let g:netrw_banner=0 "disable annoying banners
+let g:netrw_browse_split=4 "open in prior window
+let g:netrw_altv=1 "open splits to the right
+let g:netrw_liststyle=3 "tree view
+"hiding files
+let g:netrw_list_hide=netrw_gitignore#Hide()
+let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+"allows to open explorer in :edit
+"<CR>/v/t to open in an h-split/v-split/tab
+"check |netrw-browse-maps| for more mappings
+let g:netrw_mousemaps=0
+
+autocmd filetype cpp nnoremap <F9> :w <bar> !g++ -std=c++14 % -o %:r -Wl,--stack,268435456<CR>
+autocmd filetype cpp nnoremap <F10> :!%:r<CR>
+"this is for commenting and un commenting
+"1.	substitute, at the beginning of the line.any white-space character,with a // 
+"2. reverse if // is at beginning of line
+"3. goto eol
+autocmd filetype cpp nnoremap <C-C> :s/^\(\s*\)/\1\/\/<CR> :s/^\(\s*\)\/\/\/\//\1<CR> $
