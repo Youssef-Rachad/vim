@@ -84,6 +84,9 @@ map <leader>l :wincmd l<CR>
 
 nnoremap <silent> <leader>v+ :vertical resize +5<CR>
 nnoremap <silent> <leader>v- :vertical resize -5<CR>
+
+tnoremap <ESC> <c-w>N
+nnoremap <leader>t :vsp<CR>:term<CR>
 "---NETRW FILE TREE---"
 let g:netrw_winsize = 25
 let g:netrw_banner=0 "disable annoying banners
@@ -98,7 +101,7 @@ let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 "check |netrw-browse-maps| for more mappings
 
 "nnoremap <F2> :vertical split<bar>vertical resize 25<bar>e .<CR>
-nnoremap <F2> :Lexplore<CR>
+nnoremap <F2> :cd %:p:h/<CR>:Lexplore<CR>
 "---VIM---"
 autocmd Filetype vim nnoremap <F9> :w<bar>source%<bar><CR>:echo'SOURCED!'<CR>
 "---C PLUS PLUS---"
@@ -126,8 +129,10 @@ augroup END
 "let g:user_emmet_mode='a'
 
 let g:user_emmet_leader_key='¿'
+
 augroup JAVASCRIPT
-    autocmd filetype js nnoremap <C-C> :s/^\(\s*\)/\1\/\/<CR> :s/^\(\s*\)\/\/\/\//\1<CR> $
+    autocmd filetype javascript nnoremap <C-C> :s/^\(\s*\)/\1\/\/<CR> :s/^\(\s*\)\/\/\/\//\1<CR> $
+    autocmd filetype html silent nnoremap <F10> :!firefox %<CR>
 augroup END
 
 fun! IndentSave()
@@ -156,3 +161,9 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_java_checkers = ['checkstyle']
 let g:syntastic_java_checkstyle_classpath = '$HOME/vimfiles/java/checkstyle-8.4-all.jar'
 let g:syntastic_java_checkstyle_conf_file = '$HOME/vimfiles/java/checkstyle.xml'
+
+"---EXPERIMENTAL---"
+fun! ICS4U()
+    cd $HOME/Desktop/ICS4U/.
+    :Lexplore
+endfun
