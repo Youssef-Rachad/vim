@@ -4,8 +4,9 @@ Plug 'morhetz/gruvbox'
 Plug 'vim-airline/vim-airline'
 Plug 'maxboisvert/vim-simple-complete'
 Plug 'mattn/emmet-vim'
+Plug 'lervag/vimtex'
+Plug 'mechatroner/rainbow_csv'
 call plug#end()
-autocmd VimEnter * :Vexplore
 function! CreateInPreview()
     let l:filename = input("filename: ")
     execute 'silent !type '.expand('$HOME').'\vimfiles\skeletons\skeleton.'.split(l:filename, '\.')[1].' > '.b:netrw_curdir.'/'.l:filename
@@ -67,6 +68,7 @@ set nohlsearch
 "completion Settings
 set shortmess+=c
 set complete+=k
+set complete-=t
 inoremap <C-Space> <C-X><C-O>
 au BufNewFile,BufRead,BufEnter * setlocal omnifunc=syntaxcomplete#Complete
 au filetype * execute 'setlocal dict+=~/vimfiles/dictionnaries/'.&filetype.'.txt'
@@ -101,6 +103,8 @@ map <leader>l :wincmd l<CR>
 nnoremap <silent> <leader>v+ :vertical resize +5<CR>
 nnoremap <silent> <leader>v- :vertical resize -5<CR>
 
+nnoremap <leader>bn :bn<CR>
+nnoremap <leader>bp :bp<CR>
 "---TERMINAL---"
 tnoremap <ESC> <c-w>N
 nnoremap <leader>t :vsp<CR>:term<CR>
@@ -108,7 +112,7 @@ nnoremap <leader>t :vsp<CR>:term<CR>
 "---NETRW FILE TREE---"
 let g:netrw_winsize = 25
 let g:netrw_banner=0 "disable annoying banners
-let g:netrw_browse_split=3
+"let g:netrw_browse_split=3
 let g:netrw_altv=1 "open splits to the right
 let g:netrw_liststyle=3 "tree view
 "hiding files
@@ -120,6 +124,7 @@ let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 nnoremap <F2> :cd %:p:h/<CR>:Lexplore<CR>
 "---VIM---"
 autocmd Filetype vim nnoremap <F9> :w<bar>source%<bar><CR>:echo'SOURCED!'<CR>
+autocmd filetype vim nnoremap <C-C> :s/^\(\s*\)/\1"<CR> :s/^\(\s*\)""/\1<CR> $
 "---C PLUS PLUS---"
 "this is for commenting and un commenting
 "1.	replace beginning of line with with a //
@@ -152,9 +157,13 @@ augroup END
 let g:user_emmet_leader_key='¿'
 augroup JAVASCRIPT
     autocmd filetype javascript nnoremap <C-C> :s/^\(\s*\)/\1\/\/<CR> :s/^\(\s*\)\/\/\/\//\1<CR> $
-    autocmd filetype html silent nnoremap <F10> :!firefox %<CR>
+    autocmd filetype html silent nnoremap <F10> :!firefox file:///%<CR>
 augroup END
 
+augroup PHP
+    autocmd filetype php nnoremap <C-C> :s/^\(\s*\)/\1\/\/<CR> :s/^\(\s*\)\/\/\/\//\1<CR> $
+    autocmd filetype php silent nnoremap <F10> :!firefox https://localhost<CR>
+augroup END
 fun! IndentSave()
     let save_cursor = getpos(".")
     normal! gg=G
@@ -178,9 +187,22 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+let g:syntastic_go_checkers = ['go', 'gofmt', 'govet']
+let g:syntastic_cpp_checkers = ['gcc']
+let g:syntastic_c_checkers = ['gcc']
 let g:syntastic_java_checkers = ['checkstyle']
 let g:syntastic_java_checkstyle_classpath = '$HOME/vimfiles/java/checkstyle-8.4-all.jar'
 let g:syntastic_java_checkstyle_conf_file = '$HOME/vimfiles/java/checkstyle.xml'
+
+"---LaTeX---"
+"autocmd filetype tex set shellslash
+"autocmd filetype tex set sw=2
+"autocmd filetype tex set iskeyword+=:
+let g:tex_flavor='latex'
+let g:vimtex_quickfix_mode=0
+autocmd filetype tex set conceallevel=1
+autocmd filetype tex nnoremap <F9> :!pdflatex $HOME/code/latex/%<CR>
+let g:tex_conceal='abdmg'
 
 "---EXPERIMENTAL---"
 fun! ICS4U()
@@ -189,5 +211,9 @@ fun! ICS4U()
 endfun
 fun! CODE()
     cd $HOME/code/.
+    :Lexplore
+endfun
+fun! LATEX()
+    cd $HOME/code/latex/.
     :Lexplore
 endfun
