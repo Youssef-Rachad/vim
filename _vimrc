@@ -1,6 +1,13 @@
+autocmd filetype markdown set matchpairs+=$:$
+autocmd filetype markdown nnoremap ci$ vi$
+autocmd filetype markdown xnoremap i$ :<C-u> normal! T$vt$<CR>
+autocmd filetype markdown onoremap i$ :normal vi$<CR>
+autocmd filetype markdown nnoremap a$ va$
+autocmd filetype markdown xnoremap a$ :<C-u> normal!F$vf$<CR>
+autocmd filetype markdown onoremap a$ :normal va$<CR>
 call plug#begin('~/vimfiles/plugged')
 Plug 'vim-syntastic/syntastic'
-Plug 'morhetz/gruvbox'
+Plug 'gruvbox-community/gruvbox'
 Plug 'challenger-deep-theme/vim', { 'as': 'challenger-deep' }
 Plug 'vim-airline/vim-airline'
 Plug 'Youssef-Rachad/Vim_easy_predict'
@@ -9,11 +16,18 @@ Plug 'lervag/vimtex'
 Plug 'mechatroner/rainbow_csv'
 Plug 'chrisbra/Colorizer'
 call plug#end()
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+set notermguicolors
+hi Terminal ctermbg=none
+hi Normal ctermfg=255 ctermbg=NONE guifg=#ffffff guibg=NONE guisp=NONE cterm=NONE gui=NONE
+ hi Terminal ctermfg=255 ctermbg=NONE guifg=#ffffff guibg=NONE guisp=NONE cterm=NONE gui=NONE
 let g:markdown_fenced_languages = ['vim']
 "Basic
 set nocompatible
 source $VIMRUNTIME/vimrc_example.vim
-cd $HOME
+"cd $HOME
 let mapleader = ' '
 filetype plugin on
 set encoding=utf-8
@@ -33,11 +47,12 @@ let g:airline_theme = 'challenger_deep'
 set guifont=DejaVu_Sans_Mono:h12:cANSI
 set noerrorbells
 set visualbell t_vb=
-set colorcolumn=50
+set colorcolumn=80
 set signcolumn=yes
 "colorscheme gruvbox
+"let g:gruvbox_contrast_dark = 'soft'
 colorscheme challenger_deep
-
+"hi Normal guibg=NONE ctermbg=NONE
 autocmd InsertEnter * set nocursorline " Change Color when entering Insert Mode
 autocmd InsertLeave * set nocursorline " Revert Color to default when leaving Insert Mode
 
@@ -61,6 +76,7 @@ set incsearch nohlsearch
 "completion Settings
 set shortmess+=c
 set complete-=t
+set complete-=i
 au BufNewFile,BufRead,BufEnter * setlocal omnifunc=syntaxcomplete#Complete
 au filetype * execute 'setlocal dict+=~/vimfiles/dictionnaries/'.&filetype.'.txt'
 
@@ -96,6 +112,9 @@ nnoremap <silent> <leader>v- :vertical resize -5<CR>
 
 nnoremap <leader>bn :bn<CR>
 nnoremap <leader>bp :bp<CR>
+
+nnoremap k gk
+nnoremap j gj
 "---TERMINAL---"
 tnoremap <ESC> <c-w>N
 nnoremap <leader>t :vsp<CR>:term<CR>
@@ -164,6 +183,10 @@ augroup JAVASCRIPT
     autocmd filetype html silent nnoremap <F10> :!firefox file:///%:p<CR>
     autocmd filetype markdown  silent nnoremap <F10> :!firefox file:///%:p<CR>
 augroup END
+function! Pandoc()
+    execute 'silent !pandoc '.expand("%").' -f markdown -t latex -s -o'.expand("%:r").'.tex'
+    execute '!pdflatex '.expand("%:r").'.tex'
+endfun
 ":%s/.\{2}$//} --> delete 2 chars
 
 augroup PHP
@@ -215,12 +238,18 @@ let g:vimtex_quickfix_mode=0
 autocmd filetype tex set conceallevel=1
 autocmd filetype tex nnoremap <F9> :!pdflatex %<CR>
 let g:tex_conceal='abdmg'
-
+autocmd filetype tex inoremap \sec \section{}<Left>
+autocmd filetype tex inoremap \se* \section*{}<Left>
+autocmd filetype tex inoremap \beg \begin{}<CR>\end{}<Up><Left>
+autocmd filetype tex inoremap $ $$<Left>
+" Latex specification
+au BufNewFile,BufRead *.tex
+    \ set nocursorline |
+    \ set nornu |
+    \ set number |
+    \ let g:loaded_matchparen=1 |
 "---EXPERIMENTAL---"
-fun! UOFT()
-    cd $HOME/Desktop/Ecole/UofT/Year1/.
-    :Lexplore
-endfun
+
 fun! CODE()
     cd $HOME/code/.
     :Lexplore
@@ -234,10 +263,6 @@ fun! DE()
     execute 'e ~/deutsch/'.strftime('%Y_%m_%d').'.md'
 endfun
 
+au! BufNewFile,BufFilePre,BufRead *.md set makeprg=pandoc\ %\ -o\ %:r.pdf
+"au! BufNewFile,BufFilePre,BufRead *.md set makeprg=pandoc\ %\ -o\ %:r.pdf\ -V\ geometry=margin=1in\ -H\ ~/Documents/pandoc_format.tex
 
-" open omni completion menu closing previous if open and opening new menu without changing the text
-"inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') .
-            "\ '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
-" open user completion menu closing previous if open and opening new menu without changing the text
-"inoremap <expr> <S-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') .
-            "\ '<C-x><C-u><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
